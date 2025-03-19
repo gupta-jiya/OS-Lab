@@ -1,0 +1,68 @@
+#include <stdio.h>
+#define MAX 20
+int main() {
+    int p[MAX], bt[MAX], su[MAX], wt[MAX], tat[MAX], rem_bt[MAX], i, k, n, temp, quantum;
+    float wtavg, tatavg;
+    printf("Enter the number of processes: ");
+    scanf("%d", &n);
+    for (i = 0; i < n; i++) {
+        p[i] = i + 1;
+        printf("Enter the Burst Time of Process %d: ", i + 1);
+        scanf("%d", &bt[i]);
+        rem_bt[i] = bt[i];
+        printf("System/User Process (0/1)? ");
+        scanf("%d", &su[i]);
+    }
+    printf("Enter the Time Quantum: ");
+    scanf("%d", &quantum);
+    int system_count = 0, user_count = 0;
+    int system_processes[MAX], user_processes[MAX];
+    for (i = 0; i < n; i++) {
+        if (su[i] == 0) {
+            system_processes[system_count++] = i;
+        } else {
+            user_processes[user_count++] = i;
+        }
+    }
+    int time = 0;
+    wtavg = 0;
+    tatavg = 0;
+    for (i = 0; i < system_count; i++) {
+        int idx = system_processes[i];
+        if (rem_bt[idx] > quantum) {
+            rem_bt[idx] -= quantum;
+            time += quantum;
+            system_processes[system_count++] = idx;
+        } else {
+            time += rem_bt[idx];
+            tat[idx] = time;
+            wt[idx] = tat[idx] - bt[idx];
+            wtavg += wt[idx];
+            tatavg += tat[idx];
+            rem_bt[idx] = 0;
+        }
+    }
+    for (i = 0; i < user_count; i++) {
+        int idx = user_processes[i];
+        if (rem_bt[idx] > quantum) {
+            rem_bt[idx] -= quantum;
+            time += quantum;
+            user_processes[user_count++] = idx;
+        } else {
+            time += rem_bt[idx];
+            tat[idx] = time;
+            wt[idx] = tat[idx] - bt[idx];
+            wtavg += wt[idx];
+            tatavg += tat[idx];
+            rem_bt[idx] = 0;
+        }
+    }
+    printf("\nPROCESS\t SYSTEM/USER PROCESS\tBURST TIME\tWAITING TIME\tTURNAROUND TIME");
+    for (i = 0; i < n; i++) {
+        printf("\n%d \t\t %d \t\t\t %d \t\t %d \t\t %d", p[i], su[i], bt[i], wt[i], tat[i]);
+    }
+    printf("\nAverage Waiting Time: %f", wtavg / n);
+    printf("\nAverage Turnaround Time: %f", tatavg / n);
+    return 0;
+}
+
