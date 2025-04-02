@@ -1,0 +1,61 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define BUFFER_SIZE 5
+
+void wait(int *mutex) {
+(*mutex)--;
+}
+
+void signal(int *mutex) {
+(*mutex)++;
+}
+
+void producer(int *x, int *mutex, int *full, int *empty) {
+if (*empty > 0) {
+wait(mutex);
+(*full)++;
+(*empty)--;
+(*x)++;
+printf("Producer has produced: Item %d\n", *x);
+signal(mutex);
+} else {
+printf("Buffer is full!\n");
+}
+}
+
+void consumer(int *x, int *mutex, int *full, int *empty) {
+if (*full > 0) {
+wait(mutex);
+(*full)--;
+(*empty)++;
+printf("Consumer has consumed: Item %d\n", *x);
+(*x)--;
+signal(mutex);
+} else {
+printf("Buffer is empty!\n");
+}
+}
+
+int main() {
+int x = 0;
+int mutex = 1, full = 0, empty = BUFFER_SIZE;
+int choice;
+
+while (1) {
+printf("\nMenu:\n1. Produce\n2. Consume\n3. Exit\nEnter choice: ");
+scanf("%d", &choice);
+
+if (choice == 1) {
+producer(&x, &mutex, &full, &empty);
+} else if (choice == 2) {
+consumer(&x, &mutex, &full, &empty);
+} else if (choice == 3) {
+break;
+} else {
+printf("Invalid choice!\n");
+}
+}
+
+return 0;
+}
